@@ -34,8 +34,8 @@ Table * create_table(IndexType1 msize1, IndexType2 msize2) {
 }
 
 void free_table(Table * T) {
-    free(T->ks1);
-    free(T->ks2);
+    free_table1(T);
+    free_table2(T);
     free(T);
 }
 

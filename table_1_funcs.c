@@ -10,6 +10,10 @@
 #include "table_structs.h"
 #include "Errors.h"
 
+void free_ks1(KeySpace1 * ks1) {
+    for ()
+}
+
 KeySpace1 create_KS1(int i) {
     KeySpace1 KS1;// = malloc(sizeof(KeySpace1));
     KS1.key.key = i;

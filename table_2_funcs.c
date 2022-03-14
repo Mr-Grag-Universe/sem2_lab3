@@ -69,11 +69,11 @@ KeySpace2 * get_KS2(Table table, KeyType2 key) {
 
 void add_el_in_KS2(Table * table, Item * item) {
     KeySpace2 * key = get_KS2(*table, item->key2);
-    printf("%p: %p\n", key, key->node);
     if (key == NULL) {
         fprintf(stderr, "\nImpossible key.\n");
         exit(IMPOSSIBLE_KEY);
     }
+    printf("%p: %p\n", key, key->node);
 
     Node2 * node = key->node;
     Node2 * pr_node = key->node;
