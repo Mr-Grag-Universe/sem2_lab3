@@ -113,7 +113,7 @@ int main() {
         free(command);
     }
 
-    clear_table(table);
+    //clear_table(table);
     free_table(table);
     free(menu);
 

@@ -12,10 +12,14 @@
 #include "Errors.h"
 
 void free_node2(Node2 * node) {
+    if (node == NULL) {
+        exit(INVALID_FREE);
+    }
     Node2 * n_p = node;
     while (node) {
         n_p = n_p->next;
         free_item(node->info);
+        node->info = NULL;
         free(node);
         node = n_p;
     }
@@ -27,10 +31,12 @@ void free_table2(Table * table) {
     KeySpace2 * ks_2 = table->ks2;
     while (ks_1) {
         ks_2 = ks_2->next;
+        free_node2(ks_1->node);
+        ks_1->node = NULL;
         free(ks_1);
         ks_1 = ks_2;
     }
-    free(ks_1);
+    // free(ks_1);
     table->ks2 = NULL;
 }
 
@@ -39,7 +45,7 @@ KeySpace2 * create_KS2(int i) {
         return NULL;
 
     KeySpace2 * KS2 = malloc(sizeof(KeySpace2));
-    KS2->key.key = i;
+    KS2->key.key = i-1;
     KS2->next = create_KS2(i-1);
     // KS2.key.busy = false;
     KS2->node = NULL;
@@ -93,6 +99,7 @@ KeySpace2 * get_KS2(Table table, KeyType2 key) {
 
 void add_el_in_KS2(Table * table, Item * item) {
     KeySpace2 * key = get_KS2(*table, item->key2);
+    item->p2 = key;
     if (key == NULL) {
         fprintf(stderr, "\nImpossible key.\n");
         exit(IMPOSSIBLE_KEY);
@@ -126,4 +133,15 @@ void add_el_in_KS2(Table * table, Item * item) {
         key->node->info = item;
         key->node->release.numberOfRelease = i;
     }
+}
+
+bool el_k2_in_table2(Table * table, KeyType2 key) {
+    KeySpace2 * ks = table->ks2;
+    while (ks) {
+        if (keys2_eq(ks->key, key)) {
+            return true;
+        }
+        ks = ks->next;
+    }
+    return false;
 }

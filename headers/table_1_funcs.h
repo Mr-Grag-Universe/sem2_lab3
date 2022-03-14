@@ -9,4 +9,5 @@ KeyType1 chose_key1(Item item);
 IndexType1 create_ind1();
 void add_el_in_KS1(Table * table, Item * item);
 void free_table1(Table * table);
+bool el_k1_in_table1(Table * table, KeyType1 key);
 #endif //LAB3_TABLE_1_FUNCS_H

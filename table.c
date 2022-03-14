@@ -17,6 +17,7 @@
 #include "table_creation.h"
 
 void free_item(Item * item) {
+    free(item->info->data);
     free(item->info);
     //free(item->)
     free(item);
@@ -32,6 +33,8 @@ Table * create_table(IndexType1 msize1, IndexType2 msize2) {
 
     table->ks1 = malloc(sizeof(KeySpace1) * table->msize1.index);
     table->ks2 = create_KS2(msize2.index); //malloc(sizeof(KeySpace2) * table->msize2.index);
+
+    //printf("%ld", sizeof(KeySpace2));
 
     for (int i = 0; i < msize1.index; ++i)
         table->ks1[i] = create_KS1(i);
@@ -58,33 +61,6 @@ void clear_table(Table * T) {
  * функции для обнаружения элемента в таблице
  */
 
-bool items_eq(Item item1, Item item2) {
-    if (strcmp(item1.info->data, item2.info->data))
-        return false;
-    return true;
-}
-
-bool el_in_KS1(KeySpace1 ks, Item item) {
-    Node1 * node = ks.node;
-    while (node) {
-        if (items_eq(item, *(node->info)))
-            return true;
-        node = node->next;
-    }
-    return false;
-}
-
-bool el_in_table(Table table, Item item) {
-    for (int i = 0; i < table.msize1.index; ++i) {
-        if (table.ks1[i].key.busy) {
-            if (el_in_KS1(*(table.ks1), item))
-                return true;
-            return false;
-        }
-    }
-    return false;
-}
-
 void add_el(Table * table, Item * item) {
     //KeyType1 key1 = item->key1;
     //KeyType2 key2 = item->key2;
@@ -102,11 +78,21 @@ void add_el(Table * table, Item * item) {
  * и передают в основную функцию добавления
  */
 
-Item * create_item(InfoType * info) {
+bool el_k1_k2_in_table(Table * table, KeyType1 key1, KeyType2 key2) {
+    return el_k1_in_table1(table, key1) && el_k2_in_table2(table, key2);
+}
+
+Item * create_item(Table * table, InfoType * info) {
     Item * item = malloc(sizeof(Item));
     item->info = info;
     item->key1 = chose_key1(*item);
     item->key2 = chose_key2(*item);
+
+    if (el_k1_k2_in_table(table, item->key1, item->key2)) {
+        free(item);
+        return NULL;
+    }
+
     item->ind1 = create_ind1();
     item->ind2 = create_ind2();
     return item;
@@ -123,7 +109,13 @@ InfoType * get_info() {
 void add_info_dialog(Table * table) {
     printf("enter your info.\n");
     InfoType * info = get_info();       // считываем введенную информацию
-    Item * item = create_item(info);    // на основе полученных данных формируем итем
+
+    Item * item = create_item(table, info);    // на основе полученных данных формируем итем
+    if (item == NULL) {
+        free(info);
+        printf("this table is empty");
+        exit(TABLE_IS_OVERFLOW);
+    }
     printf("item was created\n");
     add_el(table, item);                // добавляем итем в таблицу
 }

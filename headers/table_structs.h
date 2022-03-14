@@ -81,10 +81,12 @@ typedef struct Items {
     IndexType1 ind1;
     // связь с элементом 2-го пространства ключей по индексу
     IndexType2 ind2;
+    // связь с элементом 1-го пространства ключей по указателю
+    //PointerType1 *p1;
+    KeySpace1 * p1;
     // связь с элементом 2-го пространства ключей по указателю
-    PointerType1 *p1;
-    // связь с элементом 2-го пространства ключей по указателю
-    PointerType2 *p2;
+    //PointerType2 *p2;
+    KeySpace2 * p2;
 } Item;
 
 typedef struct Node1 {

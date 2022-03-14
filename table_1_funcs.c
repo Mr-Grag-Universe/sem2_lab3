@@ -12,6 +12,9 @@
 #include "Errors.h"
 
 void free_node1(Node1 * node) {
+    if (node == NULL) {
+        exit(INVALID_FREE);
+    }
     Node1 * n_p = node;
     while (node) {
         n_p = n_p->next;
@@ -68,6 +71,7 @@ KeySpace1 * get_KS1(Table table, KeyType1 key) {
 
 void add_el_in_KS1(Table * table, Item * item) {
     KeySpace1 * key = get_KS1(*table, item->key1);
+    item->p1 = key;
     printf("%p: %p\n", key, key->node);
     if (key == NULL) {
         fprintf(stderr, "\nImpossible key.\n");
@@ -98,4 +102,32 @@ void add_el_in_KS1(Table * table, Item * item) {
         key->node->info = item;
         key->node->release.numberOfRelease = i;
     }
+}
+
+
+bool items_eq(Item item1, Item item2) {
+    if (strcmp(item1.info->data, item2.info->data))
+        return false;
+    return true;
+}
+
+bool el_in_KS1(KeySpace1 ks, Item item) {
+    Node1 * node = ks.node;
+    while (node) {
+        if (items_eq(item, *(node->info)))
+            return true;
+        node = node->next;
+    }
+    return false;
+}
+
+bool el_k1_in_table1(Table * table, KeyType1 key) {
+        for (int i = 0; i < table->msize1.index; ++i) {
+            if (table->ks1[i].key.busy) {
+                if (keys1_eq(table->ks1->key, key))
+                    return true;
+                return false;
+            }
+        }
+        return false;
 }
