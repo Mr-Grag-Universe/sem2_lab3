@@ -1,0 +1,8 @@
+#ifndef ERRORS
+#define ERRORS
+enum ERRORS{
+    STACK_IS_EMPTY,
+    STACK_IS_OVERFLOW,
+    IMPOSSIBLE_KEY,
+};
+#endif
