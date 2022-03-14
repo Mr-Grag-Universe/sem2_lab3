@@ -1,5 +1,5 @@
 //
-// Created by Stephan on 11.03.2022.
+// Created by Stephan on 14.03.2022.
 //
 
 #include "stdio.h"
@@ -15,32 +15,8 @@
 #include "headers/table_2_funcs.h"
 #include "table_1_funcs.h"
 #include "table_creation.h"
+#include "table_functions.h"
 
-void free_item(Item * item) {
-    free(item->info->data);
-    free(item->info);
-    //free(item->)
-    free(item);
-}
-
-Table * create_table(IndexType1 msize1, IndexType2 msize2) {
-    Table * table = malloc(sizeof(Table));
-
-    table->msize1.index = msize1.index;
-    table->csize1.index = msize1.index*msize2.index;
-    table->msize2.index = msize2.index;
-    table->csize2.index = msize1.index*msize2.index;
-
-    table->ks1 = malloc(sizeof(KeySpace1) * table->msize1.index);
-    table->ks2 = create_KS2(msize2.index); //malloc(sizeof(KeySpace2) * table->msize2.index);
-
-    //printf("%ld", sizeof(KeySpace2));
-
-    for (int i = 0; i < msize1.index; ++i)
-        table->ks1[i] = create_KS1(i);
-
-    return table;
-}
 
 void free_table(Table * T) {
     free_table1(T);
@@ -77,6 +53,7 @@ void add_el(Table * table, Item * item) {
  * преобразуют инфу в итем
  * и передают в основную функцию добавления
  */
+
 
 bool el_k1_k2_in_table(Table * table, KeyType1 key1, KeyType2 key2) {
     return el_k1_in_table1(table, key1) && el_k2_in_table2(table, key2);
@@ -149,4 +126,42 @@ void print_table(const Table table) {
         ks2 = ks2->next;
     }
     //printf("\n");
+}
+
+void print_item(const Item item) {
+    printf("key1: %d; key2: %d\n", item.key1.key, item.key2.key);
+    // printf("release: %d\n", item.);
+    printf("data: %s\n", item.info->data);
+}
+
+void find_item(Table table, KeyType1 key1, KeyType2 key2) {
+    if (!el_k1_k2_in_table(&table, key1, key2)) {
+        printf("There is no element with such keys.\n");
+        return;
+    }
+
+    KeySpace1 * ks1 = get_KS1(table, key1);
+    KeySpace2 * ks2 = get_KS2(table, key2);
+
+    Node1 * node = ks1->node;
+    while (node) {
+        if (keys2_eq(node->info->key2, key2)) {
+            printf("release1: %d; release2: %d\n", node->release.numberOfRelease, node->info->p2->release.numberOfRelease);
+            print_item(*(node->info));
+        }
+        node = node->next;
+    }
+}
+
+void find_el_k1_k2_dialog(Table table) {
+    printf("enter your keys:\n");
+    printf("key1:\n");
+    int k1 = get_int();
+    printf("key2:\n");
+    int k2 = get_int();
+
+    KeyType1 key1 = {0, k1};
+    KeyType2 key2 = {k2};
+
+    find_item(table, key1, key2);
 }

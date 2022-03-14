@@ -10,4 +10,6 @@ IndexType1 create_ind1();
 void add_el_in_KS1(Table * table, Item * item);
 void free_table1(Table * table);
 bool el_k1_in_table1(Table * table, KeyType1 key);
+KeySpace1 * get_KS1(Table table, KeyType1 key);
+bool keys1_eq(KeyType1 key1, KeyType1 key2);
 #endif //LAB3_TABLE_1_FUNCS_H

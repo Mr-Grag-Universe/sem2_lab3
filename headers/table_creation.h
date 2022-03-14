@@ -6,9 +6,4 @@
 #define LAB3_TABLE_CREATION_H
 #include "table_structs.h"
 Table * create_table(IndexType1 msize1, IndexType2 msize2);
-void free_table(Table * T);
-void clear_table(Table * T);
-void add_info_dialog(Table * table);
-void print_table(const Table table);
-void free_item(Item * item);
 #endif //LAB3_TABLE_CREATION_H

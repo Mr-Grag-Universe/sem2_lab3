@@ -9,6 +9,7 @@
 #include "time.h"
 #include "table_structs.h"
 #include "table_creation.h"
+#include "table_functions.h"
 #include "Errors.h"
 
 void free_node2(Node2 * node) {
@@ -99,7 +100,7 @@ KeySpace2 * get_KS2(Table table, KeyType2 key) {
 
 void add_el_in_KS2(Table * table, Item * item) {
     KeySpace2 * key = get_KS2(*table, item->key2);
-    item->p2 = key;
+    //item->p2 = key;
     if (key == NULL) {
         fprintf(stderr, "\nImpossible key.\n");
         exit(IMPOSSIBLE_KEY);
@@ -124,6 +125,7 @@ void add_el_in_KS2(Table * table, Item * item) {
         pr_node->next->next = NULL;
         pr_node->next->info = item;
         pr_node->next->release.numberOfRelease = i;
+        item->p2 = pr_node->next;
     }
     else {
         key->node = malloc(sizeof(Node2));
@@ -132,6 +134,7 @@ void add_el_in_KS2(Table * table, Item * item) {
         key->node->next = NULL;
         key->node->info = item;
         key->node->release.numberOfRelease = i;
+        item->p2 = key->node;
     }
 }
 

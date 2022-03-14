@@ -7,7 +7,7 @@
 #include "headers/commands.h"
 #include "MyString.h"
 #include "headers/table_creation.h"
-#include "functions_ptrs.h"
+#include "table_functions.h"
 
 void clrscr(){
     system("@cls||clear");
@@ -46,6 +46,10 @@ bool execute_command(Table * table, Command command) {
         }
         case ADD_NEW_EL: {
             add_info_dialog(table);
+            return false;
+        }
+        case FIND_EL: {
+            find_el_k1_k2_dialog(*table);
             return false;
         }
         default: {
