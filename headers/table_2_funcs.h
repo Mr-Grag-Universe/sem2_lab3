@@ -8,4 +8,5 @@ KeySpace2 * create_KS2(int number);
 void add_el_in_KS2(Table * table, Item * item);
 KeyType2 chose_key2(Item item);
 IndexType2 create_ind2();
+void free_table2(Table * table);
 #endif //LAB3_TABLE_2_FUNCS_H

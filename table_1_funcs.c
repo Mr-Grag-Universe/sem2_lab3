@@ -8,10 +8,25 @@
 #include "string.h"
 #include "time.h"
 #include "table_structs.h"
+#include "table_creation.h"
 #include "Errors.h"
 
-void free_ks1(KeySpace1 * ks1) {
-    for ()
+void free_node1(Node1 * node) {
+    Node1 * n_p = node;
+    while (node) {
+        n_p = n_p->next;
+        free_item(node->info);
+        free(node);
+        node = n_p;
+    }
+    free(n_p);
+}
+
+void free_table1(Table * table) {
+    for (int i = 0; i < table->msize1.index; ++i) {
+        free_node1(table->ks1[i].node);
+    }
+    free(table->ks1);
 }
 
 KeySpace1 create_KS1(int i) {

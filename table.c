@@ -16,6 +16,12 @@
 #include "table_1_funcs.h"
 #include "table_creation.h"
 
+void free_item(Item * item) {
+    free(item->info);
+    //free(item->)
+    free(item);
+}
+
 Table * create_table(IndexType1 msize1, IndexType2 msize2) {
     Table * table = malloc(sizeof(Table));
 

@@ -8,7 +8,31 @@
 #include "string.h"
 #include "time.h"
 #include "table_structs.h"
+#include "table_creation.h"
 #include "Errors.h"
+
+void free_node2(Node2 * node) {
+    Node2 * n_p = node;
+    while (node) {
+        n_p = n_p->next;
+        free_item(node->info);
+        free(node);
+        node = n_p;
+    }
+    free(n_p);
+}
+
+void free_table2(Table * table) {
+    KeySpace2 * ks_1 = table->ks2;
+    KeySpace2 * ks_2 = table->ks2;
+    while (ks_1) {
+        ks_2 = ks_2->next;
+        free(ks_1);
+        ks_1 = ks_2;
+    }
+    free(ks_1);
+    table->ks2 = NULL;
+}
 
 KeySpace2 * create_KS2(int i) {
     if (i <= 0)

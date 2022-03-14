@@ -10,4 +10,5 @@ void free_table(Table * T);
 void clear_table(Table * T);
 void add_info_dialog(Table * table);
 void print_table(const Table table);
+void free_item(Item * item);
 #endif //LAB3_TABLE_CREATION_H
