@@ -54,7 +54,7 @@ KeySpace2 * create_KS2(int i) {
 }
 
 KeyType2 chose_key2(Item item) {
-    srand(time(NULL));
+    srand(time(NULL)+2);
     KeyType2 key;
     key.key = rand()%10;
     //key.busy = 1;
@@ -141,8 +141,10 @@ void add_el_in_KS2(Table * table, Item * item) {
 bool el_k2_in_table2(Table * table, KeyType2 key) {
     KeySpace2 * ks = table->ks2;
     while (ks) {
-        if (keys2_eq(ks->key, key)) {
-            return true;
+        if (ks->node) {
+            if (keys2_eq(ks->key, key)) {
+                return true;
+            }
         }
         ks = ks->next;
     }

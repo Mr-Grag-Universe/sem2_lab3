@@ -127,7 +127,7 @@ bool el_in_KS1(KeySpace1 ks, Item item) {
 bool el_k1_in_table1(Table * table, KeyType1 key) {
         for (int i = 0; i < table->msize1.index; ++i) {
             if (table->ks1[i].key.busy) {
-                if (keys1_eq(table->ks1->key, key))
+                if (keys1_eq(table->ks1[i].key, key))
                     return true;
                 return false;
             }

@@ -56,7 +56,9 @@ void add_el(Table * table, Item * item) {
 
 
 bool el_k1_k2_in_table(Table * table, KeyType1 key1, KeyType2 key2) {
-    return el_k1_in_table1(table, key1) && el_k2_in_table2(table, key2);
+    bool x = el_k1_in_table1(table, key1);
+    bool y = el_k2_in_table2(table, key2);
+    return x && y;
 }
 
 Item * create_item(Table * table, InfoType * info) {
@@ -148,12 +150,14 @@ void find_item(Table table, KeyType1 key1, KeyType2 key2) {
         if (keys2_eq(node->info->key2, key2)) {
             printf("release1: %d; release2: %d\n", node->release.numberOfRelease, node->info->p2->release.numberOfRelease);
             print_item(*(node->info));
+            return;
         }
         node = node->next;
     }
+    printf("Something came wrong. Kik any programmer to fix this.\n");
 }
 
-void find_el_k1_k2_dialog(Table table) {
+void find_el_k1_k2_dialog(Table * table) {
     printf("enter your keys:\n");
     printf("key1:\n");
     int k1 = get_int();
@@ -163,5 +167,5 @@ void find_el_k1_k2_dialog(Table table) {
     KeyType1 key1 = {0, k1};
     KeyType2 key2 = {k2};
 
-    find_item(table, key1, key2);
+    find_item(*table, key1, key2);
 }

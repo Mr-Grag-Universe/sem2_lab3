@@ -9,6 +9,9 @@
 #include "headers/table_creation.h"
 #include "table_functions.h"
 
+typedef menu_funcs (void (*) (Table *));
+typedef menu_funcs_arr (void (**) (Table *));
+
 void clrscr(){
     system("@cls||clear");
 }
@@ -49,7 +52,7 @@ bool execute_command(Table * table, Command command) {
             return false;
         }
         case FIND_EL: {
-            find_el_k1_k2_dialog(*table);
+            find_el_k1_k2_dialog(table);
             return false;
         }
         default: {
@@ -87,6 +90,13 @@ Command get_command_code(char * command) {
     else return UNKNOWN_COMMAND;
 }
 
+void* create_funcs_arr() {
+    void (**funcs) (Table *)  = malloc(sizeof(menu_funcs)*UNKNOWN_COMMAND);
+    funcs[ADD_NEW_EL] = add_info_dialog;
+    funcs[FIND_EL] = find_el_k1_k2_dialog;
+    return funcs;
+}
+
 int main() {
     bool finish = false;
     char ** menu = init_menu_points();
@@ -94,6 +104,7 @@ int main() {
     IndexType2 msize2 = {10};
     Table * table = create_table(msize1, msize2);
 
+    void (**funcs) (Table *) = create_funcs_arr();
 
     while (!finish) {
         // clrscr();
