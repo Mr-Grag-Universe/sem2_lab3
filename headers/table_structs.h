@@ -43,6 +43,7 @@ typedef struct KeyType1 {
     int key;
 } KeyType1;
 typedef struct KeyType2 {
+    bool busy;
     int key;
 } KeyType2;
 
@@ -61,6 +62,7 @@ typedef struct KeySpace1 {
 } KeySpace1;
 typedef struct KeySpace2 {
     // ключ элемента
+    // хэши от ключей - индекс в таблице
     KeyType2 key;
     // указатель на информацию
     struct Node2 *node;

@@ -11,9 +11,11 @@
 #include "table_creation.h"
 #include "table_functions.h"
 #include "Errors.h"
+#include "MyString.h"
 
 void free_node1(Node1 * node) {
     if (node == NULL) {
+        //return;
         exit(INVALID_FREE);
     }
     Node1 * n_p = node;
@@ -35,17 +37,18 @@ void free_table1(Table * table) {
 
 KeySpace1 create_KS1(int i) {
     KeySpace1 KS1;// = malloc(sizeof(KeySpace1));
-    KS1.key.key = i;
+    KS1.key.key = 0;
     KS1.key.busy = false;
     KS1.node = NULL;
     return KS1;
 }
 
-KeyType1 chose_key1(Item item) {
-    srand(time(NULL));
+KeyType1 get_key1() {
+    ///srand(time(NULL));
     KeyType1 key;
-    key.key = rand()%10;
-    key.busy = 1;
+    printf("enter your key for the new element in the lookthrough table.\n");
+    key.key = get_int(); // rand()%10;
+    key.busy = true;
     return key;
 }
 
@@ -61,23 +64,90 @@ bool keys1_eq(KeyType1 key1, KeyType1 key2) {
     return false;
 }
 
-KeySpace1 * get_KS1(Table table, KeyType1 key) {
-    for (int i = 0; i < table.msize1.index; ++i) {
-        if (keys1_eq(table.ks1[i].key, key)) {
-            return table.ks1 + i;
-        }
+int comparator(const void * ks1, const void * ks2) {
+    KeySpace1 * KS1 = (KeySpace1*) ks1;
+    KeySpace1 * KS2 = (KeySpace1*) ks2;
+
+    if (KS1->key.key < KS2->key.key) {
+        return 1;
     }
-    return NULL;
+    if (KS1->key.key > KS2->key.key) {
+        return -1;
+    }
+    return 0;
+}
+
+int number_of_ks1_b(Table table) {
+    for (int i = 0; i < table.msize1.index; ++i) {
+        if (table.ks1[i].key.busy == false)
+            return i;
+    }
+    return table.msize1.index;
+}
+
+int binarySearch(Table * table, KeyType1 key) {
+
+    int left = 0, right = number_of_ks1_b(*table);
+    while (left != right) {
+        int m = (left+right)/2;
+        KeySpace1 * p = (table->ks1+m);
+        if (p->key.busy) {
+            if (comparator(&key, p) < 0) {
+                //if (comparator(el, p) > 0) left = m + 1;
+                left = m + 1;
+            }
+            else if (comparator(&key, p) == 0)
+                return m;
+            else
+                right = m;
+        }
+        else right = m;
+        //else if (comparator(&key, p) < 0) right = m;
+        //else return m;
+    }
+    return left;
+}
+
+void cope_key1(KeyType1 * res, KeyType1 key) {
+    *(res) = (KeyType1) {key.busy, key.key};
+}
+
+KeySpace1 * get_KS1(Table * table, KeyType1 key) {
+    if (table->ks1[0].key.busy == false) {
+        cope_key1(&(table->ks1->key), key);
+        return table->ks1;
+    }
+
+    KeySpace1 * ks = &((KeySpace1) {key, NULL});
+    size_t x = binarySearch(table, key);
+    KeySpace1 * ks1 = table->ks1 + x;//table.ks1, ks, sizeof(*ks), table.msize1.index, comparator);
+    if (table->ks1 + table->msize1.index-1 == ks1) {
+        if (keys1_eq(ks1->key, ks->key)) {
+            return ks1;
+        }
+        else
+            return NULL;
+    }
+
+    int num = number_of_ks1_b(*table);
+    memmove(table->ks1 + x+1, table->ks1 + x, sizeof(KeySpace1) * (num-x));
+    print_table(*table);
+    cope_key1(&(table->ks1[x].key), key);
+    table->ks1[x].key.busy = true;
+    table->ks1[x].node = NULL;
+
+    return ks1;
 }
 
 void add_el_in_KS1(Table * table, Item * item) {
-    KeySpace1 * key = get_KS1(*table, item->key1);
+    KeySpace1 * key = get_KS1(table, item->key1);
     //item->p1 = key;
-    printf("%p: %p\n", key, key->node);
+    //printf("%p: %p\n", key, key->node);
     if (key == NULL) {
         fprintf(stderr, "\nImpossible key.\n");
         exit(IMPOSSIBLE_KEY);
     }
+    key->key.busy = true;
 
     Node1 * node = key->node;
     Node1 * pr_node = key->node;

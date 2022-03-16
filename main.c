@@ -104,7 +104,7 @@ int main() {
     IndexType2 msize2 = {10};
     Table * table = create_table(msize1, msize2);
 
-    void (**funcs) (Table *) = create_funcs_arr();
+    //void (**funcs) (Table *) = create_funcs_arr();
 
     while (!finish) {
         // clrscr();

@@ -11,6 +11,7 @@
 #include "table_creation.h"
 #include "table_functions.h"
 #include "Errors.h"
+#include "MyString.h"
 
 void free_node2(Node2 * node) {
     if (node == NULL) {
@@ -41,7 +42,8 @@ void free_table2(Table * table) {
     table->ks2 = NULL;
 }
 
-KeySpace2 * create_KS2(int i) {
+KeySpace2 create_KS2(int i) {
+    /*
     if (i <= 0)
         return NULL;
 
@@ -51,13 +53,29 @@ KeySpace2 * create_KS2(int i) {
     // KS2.key.busy = false;
     KS2->node = NULL;
     return KS2;
+     */
+    KeySpace2 ks2;// = malloc(max_size* sizeof(KeySpace2));
+    //for (int i = 0; i < max_size; ++i) {
+    ks2.key = (KeyType2){false, i};
+    ks2.node = NULL;
+    ks2.next = NULL;
+    //}
+    return ks2;
 }
 
-KeyType2 chose_key2(Item item) {
-    srand(time(NULL)+2);
+int hash_func(KeyType2 key) {
+    return key.key % 100;
+}
+
+void cope_key2(KeyType2 * res, KeyType2 key) {
+    *(res) = (KeyType2) {key.busy, key.key};
+}
+
+KeyType2 get_key2() {
     KeyType2 key;
-    key.key = rand()%10;
-    //key.busy = 1;
+    printf("enter your key for the new element in the hash table.\n");
+    key.key = get_int(); // rand()%10;
+    key.busy = true;
     return key;
 }
 
@@ -73,33 +91,39 @@ bool keys2_eq(KeyType2 key1, KeyType2 key2) {
     return false;
 }
 
-KeySpace2 * get_KS2(Table table, KeyType2 key) {
-    KeySpace2 * ks2 = table.ks2;
-    KeySpace2 * ks_pr = table.ks2;
-    int i = 0;
-    while (ks2 && i < table.msize2.index) {
-        if (keys2_eq(ks2->key, key)) {
+KeySpace2 * get_KS2(Table table, Item item) {
+    int ind = hash_func(item.key2)%table.msize2.index;
+
+    KeySpace2 * ks2 = table.ks2+ind;
+    KeySpace2 * ks_pr = table.ks2+ind;
+    int i = ind;
+
+    if (ks2->node == NULL || keys2_eq(ks2->key, item.key2)) {
+        return ks2;
+    }
+    i++;
+
+    while (ks2[i].key.busy) {
+        if (keys2_eq(ks2[i].key, item.key2)) {
             return ks2;
+        } else if (i == ind) {
+            return NULL;
         }
         ks_pr = ks2;
         ks2 = ks2->next;
-        i++;
-    }
-
-    if (i == table.msize2.index) {
-        return NULL;
+        i = (i + 1) % table.msize2.index;
     }
 
     ks_pr->next = malloc(sizeof(KeySpace2));
     //ks_pr = ks_pr->next;
-    ks_pr->next->next = NULL;
+    //ks_pr->next->next = NULL;
     ks_pr->next->node = NULL;
-    ks_pr->next->key.key = key.key;
+    ks_pr->next->key.key = item.key2.key;
     return ks_pr->next;
 }
 
 void add_el_in_KS2(Table * table, Item * item) {
-    KeySpace2 * key = get_KS2(*table, item->key2);
+    KeySpace2 * key = get_KS2(*table, *item);
     //item->p2 = key;
     if (key == NULL) {
         fprintf(stderr, "\nImpossible key.\n");
