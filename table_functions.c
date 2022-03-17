@@ -91,20 +91,18 @@ void add_el(Table * table, Item * item) {
 
 bool el_k1_k2_in_table(Table * table, KeyType1 key1, KeyType2 key2) {
     bool x = el_k1_in_table1(table, key1);
-    ///bool y = el_k2_in_table2(table, key2);
-    return x;/// && y;
+    bool y = el_k2_in_table2(table, key2);
+    return x && y;
 }
 
 Item * create_item(Table * table, InfoType * info, KeyType1 key1, KeyType2 key2) {
     Item * item = malloc(sizeof(Item));
     item->info = info;
-    //item->key1 = chose_key1(*item);
-    if (item->key1.key < 0 || item->key1.key > table->msize1.index) {
+    if (key1.key < 0 || key1.key > table->msize1.index) {
         free_item(item);
         printf("Unresolved key");
         return NULL;
     }
-    //int ind = hash_func(*item)%table->msize2.index;
     cope_key1(&(item->key1), key1);
     cope_key2(&(item->key2), key2);
 
@@ -119,7 +117,6 @@ Item * create_item(Table * table, InfoType * info, KeyType1 key1, KeyType2 key2)
 }
 
 InfoType * get_info() {
-    char * answer;
     InfoType * info = malloc(sizeof(InfoType));
     printf("Enter your data here:\n-> ");
     info->data = get_line();
@@ -130,10 +127,13 @@ void add_info_dialog(Table * table) {
     printf("enter your info.\n");
     InfoType * info = get_info();       // считываем введенную информацию
 
+    ///get_line();
+
     KeyType1 key1 = get_key1();
     KeyType2 key2 = get_key2();
 
     Item * item = create_item(table, info, key1, key2);    // на основе полученных данных формируем итем
+
     if (item == NULL) {
         free(info);
         printf("this table is empty or your key is wrong\n");
@@ -159,19 +159,18 @@ void print_table(const Table table) {
         }
         printf("\n");
     }
-    /*printf("The second table.\n");
-    KeySpace2 * ks2 = table.ks2;
-    while (ks2) {
-        printf("%d: ", ks2->key.key);
-        Node2 * n = ks2->node;
-        while (n) {
-            printf("%p, ", n);
-            n = n->next;
+    printf("The second table.\n");
+    for (int i = 0; i < size2; ++i) {
+        printf("hash: %d, key: %d, busy: %d", i, table.ks2[i].key.key, table.ks2[i].key.busy);
+        if (table.ks2[i].key.busy) {
+            Node2 * node = table.ks2[i].node;
+            while (node) {
+                printf("%p\t", node);
+                node = node->next;
+            }
         }
-        printf("\b\b\n");
-        ks2 = ks2->next;
+        printf("\n");
     }
-    //printf("\n");*/
 }
 
 /*
@@ -190,18 +189,23 @@ void find_item(Table table, KeyType1 key1, KeyType2 key2) {
         return;
     }
 
-    KeySpace1 * ks1 = get_KS1(table, key1);
-    KeySpace2 * ks2 = get_KS2(table, key2);
-
-    Node1 * node = ks1->node;
-    while (node) {
-        if (keys2_eq(node->info->key2, key2)) {
-            printf("release1: %d; release2: %d\n", node->release.numberOfRelease, node->info->p2->release.numberOfRelease);
-            print_item(*(node->info));
-            return;
+    for (int i = 0; i < table.msize1.index; ++i) {
+        if (table.ks1[i].key.busy) {
+            if (table.ks1[i].key.key == key1.key) {
+                Node1 * node = table.ks1[i].node;
+                while (node) {
+                    if (keys2_eq(node->info->key2, key2)) {
+                        printf("release1: %d; release2: %d\n", node->release.numberOfRelease, node->info->p2->release.numberOfRelease);
+                        print_item(*(node->info));
+                        return;
+                    }
+                    node = node->next;
+                }
+            }
         }
-        node = node->next;
     }
+
+
     printf("Something came wrong. Kik any programmer to fix this.\n");
 }
 
@@ -212,8 +216,8 @@ void find_el_k1_k2_dialog(Table * table) {
     printf("key2:\n");
     int k2 = get_int();
 
-    KeyType1 key1 = {0, k1};
-    KeyType2 key2 = {k2};
+    KeyType1 key1 = {1, k1};
+    KeyType2 key2 = {1, k2};
 
     find_item(*table, key1, key2);
 }
@@ -228,19 +232,22 @@ void delete_el(Table * table, KeyType1 key1, KeyType2 key2) {
         return;
     }
 
-    KeySpace1 * ks1 = get_KS1(*table, key1);
-    KeySpace2 * ks2 = get_KS2(*table, key2);
-
-    Node1 * node = ks1->node;
-    while (node) {
-        if (keys2_eq(node->info->key2, key2)) {
-            //printf("release1: %d; release2: %d\n", node->release.numberOfRelease, node->info->p2->release.numberOfRelease);
-            //print_item(*(node->info));
-
-            return;
+    for (int i = 0; i < table->msize1.index; ++i) {
+        if (table->ks1[i].key.busy) {
+            if (table->ks1[i].key.key == key1.key) {
+                Node1 * node = table->ks1[i].node;
+                while (node) {
+                    if (keys2_eq(node->info->key2, key2)) {
+                        printf("release1: %d; release2: %d\n", node->release.numberOfRelease, node->info->p2->release.numberOfRelease);
+                        print_item(*(node->info));
+                        return;
+                    }
+                    node = node->next;
+                }
+            }
         }
-        node = node->next;
     }
+
     printf("Something came wrong. Kik any programmer to fix this.\n");
 }
 

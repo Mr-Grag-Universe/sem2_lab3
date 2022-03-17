@@ -119,7 +119,9 @@ KeySpace1 * get_KS1(Table * table, KeyType1 key) {
     }
 
     KeySpace1 * ks = &((KeySpace1) {key, NULL});
+    getchar();
     size_t x = binarySearch(table, key);
+    getchar();
     KeySpace1 * ks1 = table->ks1 + x;//table.ks1, ks, sizeof(*ks), table.msize1.index, comparator);
     if (table->ks1 + table->msize1.index-1 == ks1) {
         if (keys1_eq(ks1->key, ks->key)) {
@@ -141,6 +143,7 @@ KeySpace1 * get_KS1(Table * table, KeyType1 key) {
 
 void add_el_in_KS1(Table * table, Item * item) {
     KeySpace1 * key = get_KS1(table, item->key1);
+    getchar();
     //item->p1 = key;
     //printf("%p: %p\n", key, key->node);
     if (key == NULL) {

@@ -9,8 +9,8 @@
 #include "headers/table_creation.h"
 #include "table_functions.h"
 
-typedef menu_funcs (void (*) (Table *));
-typedef menu_funcs_arr (void (**) (Table *));
+//typedef menu_funcs (void (*) (Table *));
+//typedef menu_funcs_arr (void (**) (Table *));
 
 void clrscr(){
     system("@cls||clear");
@@ -91,10 +91,10 @@ Command get_command_code(char * command) {
 }
 
 void* create_funcs_arr() {
-    void (**funcs) (Table *)  = malloc(sizeof(menu_funcs)*UNKNOWN_COMMAND);
-    funcs[ADD_NEW_EL] = add_info_dialog;
-    funcs[FIND_EL] = find_el_k1_k2_dialog;
-    return funcs;
+    //void (**funcs) (Table *)  = malloc(sizeof(menu_funcs)*UNKNOWN_COMMAND);
+    //funcs[ADD_NEW_EL] = add_info_dialog;
+    //funcs[FIND_EL] = find_el_k1_k2_dialog;
+    //return funcs;
 }
 
 int main() {
@@ -111,6 +111,10 @@ int main() {
         print_menu(menu);
 
         char * command = get_line();
+        if (command[0] == '\0') {
+            free(command);
+            continue;
+        }
         delete_double_spaces(&command);
         printf("%s\n", command);
 
