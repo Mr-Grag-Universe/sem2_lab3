@@ -26,6 +26,7 @@ char ** init_menu_points() {
     menu_points[CREATE_NEW_TABLE] = "create a new table";
     menu_points[DELETE_TABLE] = "delete table";
     menu_points[DELETE_ALl] = "delete all tables";
+    menu_points[PRINT_TABLE] = "print table";
     return menu_points;
 }
 
@@ -59,6 +60,10 @@ bool execute_command(Table * table, Command command) {
             delete_el_k1_k2_dialog(table);
             return false;
         }
+        case PRINT_TABLE: {
+            print_table(*table);
+            return false;
+        }
         default: {
             printf("Your command is wrong!\n");
             return false;
@@ -83,6 +88,8 @@ Command get_command_code(char * command) {
         return ADD_NEW_EL;
     else if (!strcmp(command, "delete"))
         return DELETE_EL;
+    else if (!strcmp(command, "print"))
+        return PRINT_TABLE;
     else if (!strcmp(command, "clear"))
         return CLEAR_TABLE;
     else if (!strcmp(command, "create new table"))
@@ -120,7 +127,7 @@ int main() {
             continue;
         }
         delete_double_spaces(&command);
-        printf("%s\n", command);
+        //printf("%s\n", command);
 
         if (check_command(command) == false) {
             printf("Your command is wrong.");
@@ -130,7 +137,7 @@ int main() {
 
         Command command_code = get_command_code(command);
 
-        print_table(*table);
+        //print_table(*table);
         finish = execute_command(table, command_code);
 
         free(command);

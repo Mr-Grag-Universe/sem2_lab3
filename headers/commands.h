@@ -9,6 +9,7 @@ typedef enum Commands {
     ADD_NEW_EL,
     FIND_EL,
     DELETE_EL,
+    PRINT_TABLE,
     CLEAR_TABLE,
     CREATE_NEW_TABLE,
     DELETE_TABLE,

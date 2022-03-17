@@ -143,17 +143,32 @@ void add_info_dialog(Table * table) {
     add_el(table, item);                // добавляем итем в таблицу
 }
 
+void print_item(const Item item) {
+    printf("key1: %d; key2: %d\n", item.key1.key, item.key2.key);
+    // printf("release: %d\n", item.);
+    printf("data: %s\n", item.info->data);
+}
+
+void print_node1(Node1 node) {
+    printf("key1: %d, key2: %d\n", node.info->key1.key, node.info->key2.key);
+    printf("data: %s\n", node.info->info->data);
+}
+void print_node2(Node2 node) {
+    printf("key1: %d, key2: %d\n", node.info->key1.key, node.info->key2.key);
+    printf("data: %s\n", node.info->info->data);
+}
+
 void print_table(const Table table) {
     int size1 = table.msize1.index;
     int size2 = table.msize2.index;
 
     printf("The first table.\n");
     for (int i = 0; i < size1; ++i) {
-        printf("%d, %d", table.ks1[i].key.key, table.ks1[i].key.busy);
+        printf("key: %d, busy: %d\n", table.ks1[i].key.key, table.ks1[i].key.busy);
         if (table.ks1[i].key.busy) {
             Node1 * node = table.ks1[i].node;
             while (node) {
-                printf("%p\t", node);
+                print_node1(*node);
                 node = node->next;
             }
         }
@@ -161,11 +176,11 @@ void print_table(const Table table) {
     }
     printf("The second table.\n");
     for (int i = 0; i < size2; ++i) {
-        printf("hash: %d, key: %d, busy: %d", i, table.ks2[i].key.key, table.ks2[i].key.busy);
+        printf("hash: %d, key: %d, busy: %d\n", i, table.ks2[i].key.key, table.ks2[i].key.busy);
         if (table.ks2[i].key.busy) {
             Node2 * node = table.ks2[i].node;
             while (node) {
-                printf("%p\t", node);
+                print_node2(*node);
                 node = node->next;
             }
         }
@@ -176,12 +191,6 @@ void print_table(const Table table) {
 /*
  * find item with 2 keys
  */
-
-void print_item(const Item item) {
-    printf("key1: %d; key2: %d\n", item.key1.key, item.key2.key);
-    // printf("release: %d\n", item.);
-    printf("data: %s\n", item.info->data);
-}
 
 void find_item(Table table, KeyType1 key1, KeyType2 key2) {
     if (!el_k1_k2_in_table(&table, key1, key2)) {
@@ -205,17 +214,7 @@ void find_item(Table table, KeyType1 key1, KeyType2 key2) {
         }
     }
 
-
     printf("Something came wrong. Kik any programmer to fix this.\n");
-}
-
-void print_node1(Node1 node) {
-    printf("key1: %d, key2: %d\n", node.info->key1.key, node.info->key2.key);
-    printf("data: %s\n", node.info->info->data);
-}
-void print_node2(Node2 node) {
-    printf("key1: %d, key2: %d\n", node.info->key1.key, node.info->key2.key);
-    printf("data: %s\n", node.info->info->data);
 }
 
 void find_items_k1(Table table, KeyType1 key) {
@@ -285,7 +284,6 @@ void find_el_k1_k2_dialog(Table * table) {
         default:
             break;
     }
-
 }
 
 /*
@@ -414,19 +412,78 @@ void delete_el(Table * table, KeyType1 key1, KeyType2 key2) {
 }
 
 void delete_el_k1_k2_dialog(Table * table) {
-    printf("enter keys of this element:\n");
-    printf("key1:\n");
-    int k1 = get_int();
-    printf("key2:\n");
-    int k2 = get_int();
-
-    KeyType1 key1 = {1, k1};
-    KeyType2 key2 = {1, k2};
-
-    if (!el_k1_k2_in_table(table, key1, key2)) {
-        printf("there is not such element in table\n");
-        return;
+    printf("What do you wanna to delete?\n1) El with 2 keys\n2) Els with 1 key");
+    int x = -1;
+    while (x < 1 || x > 2) {
+        printf("\n");
+        x = get_int();
     }
 
-    delete_el(table, key1, key2);
+    switch (x) {
+        case 1: {
+            printf("enter keys of this element:\n");
+            printf("key1:\n");
+            int k1 = get_int();
+            printf("key2:\n");
+            int k2 = get_int();
+
+            KeyType1 key1 = {1, k1};
+            KeyType2 key2 = {1, k2};
+
+            if (!el_k1_k2_in_table(table, key1, key2)) {
+                printf("there is not such element in table\n");
+                return;
+            }
+
+            delete_el(table, key1, key2);
+            break;
+        }
+        case 2: {
+            printf("Which key do you have?\n1) key1\n2) key2\n");
+            x = 0;
+            while (x < 1 || x > 2) {
+                printf("\n");
+                x = get_int();
+            }
+
+            printf("enter your key:\n");
+            int k = get_int();
+
+            if (x == 1) {
+                KeyType1 key = {1, k};
+                KeySpace1 * ks = getKey1(table->ks1, key, table->msize1.index);
+                int number = number_of_nodes1(ks->node);
+                int i = 0;
+                KeyType2 * keys = malloc(sizeof(KeyType2) * number);
+                Node1 * node = ks->node;
+                while (node) {
+                    keys[i].key = node->info->key2.key;
+                    i++;
+                    node = node->next;
+                }
+                for (int j = 0; j < number; ++j)
+                    delete_el(table, key, keys[j]);
+                free(keys);
+            } else if (x == 2) {
+                KeyType2 key = {1, k};
+                KeySpace2 * ks = getKey2(table->ks2, key, table->msize2.index);
+                int number = number_of_nodes2(ks->node);
+                int i = 0;
+                KeyType1 * keys = malloc(sizeof(KeyType1) * number);
+                Node2 * node = ks->node;
+                while (node) {
+                    keys[i].key = node->info->key1.key;
+                    i++;
+                    node = node->next;
+                }
+                for (int j = 0; j < number; ++j)
+                    delete_el(table, keys[j], key);
+                free(keys);
+            } else
+                return;
+            break;
+        }
+        default:
+            break;
+    }
 }
