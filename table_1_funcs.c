@@ -119,9 +119,13 @@ KeySpace1 * get_KS1(Table * table, KeyType1 key) {
     }
 
     KeySpace1 * ks = &((KeySpace1) {key, NULL});
-    getchar();
+    //getchar();
     size_t x = binarySearch(table, key);
-    getchar();
+    if (table->ks1[x].key.busy) {
+        if (table->ks1[x].key.key == key.key)
+            return table->ks1+x;
+    }
+    //getchar();
     KeySpace1 * ks1 = table->ks1 + x;//table.ks1, ks, sizeof(*ks), table.msize1.index, comparator);
     if (table->ks1 + table->msize1.index-1 == ks1) {
         if (keys1_eq(ks1->key, ks->key)) {
@@ -152,7 +156,17 @@ void add_el_in_KS1(Table * table, Item * item) {
     }
     key->key.busy = true;
 
-    Node1 * node = key->node;
+    //Node1 * node = key->node;
+    Node1 * node = malloc(sizeof(Node1));
+    node->info = item;
+    node->next = key->node;
+    key->node = node;
+    if (node->next)
+        node->release.numberOfRelease = node->next->release.numberOfRelease;
+    else
+        node->release.numberOfRelease = 0;
+
+    /*
     Node1 * pr_node = key->node;
     int i = 0;
     while (node) {
@@ -163,7 +177,6 @@ void add_el_in_KS1(Table * table, Item * item) {
     }
     if (pr_node) {
         pr_node->next = malloc(sizeof(Node1));
-        //node = pr_node->next;
         pr_node->next->next = NULL;
         pr_node->next->info = item;
         pr_node->next->release.numberOfRelease = i;
@@ -172,12 +185,11 @@ void add_el_in_KS1(Table * table, Item * item) {
     else {
         key->node = malloc(sizeof(Node1));
         key->key.busy = true;
-        //node = key->node;
         key->node->next = NULL;
         key->node->info = item;
         item->p1 = key->node;
         key->node->release.numberOfRelease = i;
-    }
+    }*/
 }
 
 
@@ -198,12 +210,12 @@ bool el_in_KS1(KeySpace1 ks, Item item) {
 }
 
 bool el_k1_in_table1(Table * table, KeyType1 key) {
-        for (int i = 0; i < table->msize1.index; ++i) {
-            if (table->ks1[i].key.busy) {
-                if (keys1_eq(table->ks1[i].key, key))
-                    return true;
-                return false;
-            }
+    for (int i = 0; i < table->msize1.index; ++i) {
+        if (table->ks1[i].key.busy) {
+            if (key.key == table->ks1[i].key.key)
+                return true;
+            //return false;
         }
-        return false;
+    }
+    return false;
 }

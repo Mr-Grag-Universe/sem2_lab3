@@ -55,6 +55,10 @@ bool execute_command(Table * table, Command command) {
             find_el_k1_k2_dialog(table);
             return false;
         }
+        case DELETE_EL: {
+            delete_el_k1_k2_dialog(table);
+            return false;
+        }
         default: {
             printf("Your command is wrong!\n");
             return false;

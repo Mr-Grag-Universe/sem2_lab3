@@ -226,29 +226,128 @@ void find_el_k1_k2_dialog(Table * table) {
  * delete an item with two keys
  */
 
+KeySpace1 * getKey1(KeySpace1 * KS, KeyType1 key, int size) {
+    for (int i = 0; i < size; ++i) {
+        if (KS[i].key.busy) {
+            if (KS[i].key.key == key.key) {
+                return KS+i;
+            }
+        }
+    }
+    return NULL;
+}
+
+KeySpace2 * getKey2(KeySpace2 * KS, KeyType2 key, int size) {
+    for (int i = 0; i < size; ++i) {
+        if (KS[i].key.busy) {
+            if (KS[i].key.key == key.key) {
+                return KS+i;
+            }
+        }
+    }
+    return NULL;
+}
+
+int number_of_nodes1(Node1 * node) {
+    if (node == NULL) {
+        return 0;
+    }
+    int x = number_of_nodes1(node->next);
+    node->release.numberOfRelease = x;
+    return x+1;
+}
+
+int number_of_nodes2(Node2 * node) {
+    if (node == NULL) {
+        return 0;
+    }
+    int x = number_of_nodes2(node->next);
+    node->release.numberOfRelease = x;
+    return x+1;
+}
+
+void delete_node1(KeySpace1 * ks1, KeyType1 key1, KeyType2 key2) {
+    Node1 * node = ks1->node;
+    Node1 * pr_node = ks1->node;
+    while (node && node->info->key2.key != key2.key) {
+        pr_node = node;
+        node = node->next;
+    }
+    if (node == NULL) {
+        fprintf(stderr, "NULL prt in searching for node\n");
+        exit(333);
+    }
+    if (pr_node == node)
+        ks1->node = ks1->node->next;
+    else
+        pr_node->next = node->next;
+
+    free(node);
+
+    number_of_nodes1(ks1->node);
+}
+
+void delete_node2(KeySpace2 * ks2, KeyType1 key1, KeyType2 key2) {
+    Node2 * node = ks2->node;
+    Node2 * pr_node = ks2->node;
+    while (node && node->info->key1.key != key1.key) {
+        pr_node = node;
+        node = node->next;
+    }
+    if (node == NULL) {
+        fprintf(stderr, "NULL prt in searching for node\n");
+        exit(333);
+    }
+    if (pr_node == node)
+        ks2->node = ks2->node->next;
+    else
+        pr_node->next = node->next;
+    free(node);
+
+    number_of_nodes2(ks2->node);
+}
+
+Item * get_item(Table * table, KeyType1 key1, KeyType2 key2) {
+    for (int i = 0; i < table->msize1.index; ++i) {
+        if (table->ks1[i].key.busy) {
+            if (table->ks1[i].key.key == key1.key) {
+                Node1 * node = table->ks1[i].node;
+                while (node && node->info->key2.key != key2.key) {
+                    node = node->next;
+                }
+                if (node == NULL)
+                    return NULL;
+                return node->info;
+            }
+        }
+    }
+    return NULL;
+}
+
 void delete_el(Table * table, KeyType1 key1, KeyType2 key2) {
     if (!el_k1_k2_in_table(table, key1, key2)) {
         printf("There is no element with such keys.\n");
         return;
     }
 
-    for (int i = 0; i < table->msize1.index; ++i) {
-        if (table->ks1[i].key.busy) {
-            if (table->ks1[i].key.key == key1.key) {
-                Node1 * node = table->ks1[i].node;
-                while (node) {
-                    if (keys2_eq(node->info->key2, key2)) {
-                        printf("release1: %d; release2: %d\n", node->release.numberOfRelease, node->info->p2->release.numberOfRelease);
-                        print_item(*(node->info));
-                        return;
-                    }
-                    node = node->next;
-                }
-            }
-        }
+    Item * item = get_item(table, key1, key2);
+    if (item == NULL) {
+        fprintf(stderr, "Something came wrong. Kik any programmer to fix this.\n");
+        return;
     }
 
-    printf("Something came wrong. Kik any programmer to fix this.\n");
+    KeySpace1 * ks1 = getKey1(table->ks1, key1, table->msize1.index);
+    KeySpace2 * ks2 = getKey2(table->ks2, key2, table->msize2.index);
+
+    delete_node1(ks1, key1, key2);
+    if (ks1->node == NULL) {
+        memmove(ks1, ks1+1, ((size_t)(table->ks1+table->msize1.index-1) - (size_t)ks1));
+    }
+    delete_node2(ks2, key1, key2);
+    if (ks2->node == NULL) {
+        ks2->key.busy = false;
+    }
+    free_item(item);
 }
 
 void delete_el_k1_k2_dialog(Table * table) {
@@ -259,10 +358,12 @@ void delete_el_k1_k2_dialog(Table * table) {
     int k2 = get_int();
 
     KeyType1 key1 = {1, k1};
-    KeyType2 key2 = {k2};
+    KeyType2 key2 = {1, k2};
 
-    // delete_el_k1_table1();
-    // delete_el_k2_table2();
+    if (!el_k1_k2_in_table(table, key1, key2)) {
+        printf("there is not such element in table\n");
+        return;
+    }
 
     delete_el(table, key1, key2);
 }

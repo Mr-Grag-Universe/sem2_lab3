@@ -135,12 +135,12 @@ void add_el_in_KS2(Table * table, Item * item) {
         fprintf(stderr, "\nImpossible key.\n");
         exit(IMPOSSIBLE_KEY);
     }
-    printf("%p: %p\n", key, key->node);
+    //printf("%p: %p\n", key, key->node);
 
     Node2 * node = key->node;
     Node2 * pr_node = key->node;
 
-    printf("start finding a free node\n");
+    //printf("start finding a free node\n");
 
     cope_key2(&(key->key), item->key2);
     key->key.busy = true;
