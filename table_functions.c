@@ -209,17 +209,83 @@ void find_item(Table table, KeyType1 key1, KeyType2 key2) {
     printf("Something came wrong. Kik any programmer to fix this.\n");
 }
 
+void print_node1(Node1 node) {
+    printf("key1: %d, key2: %d\n", node.info->key1.key, node.info->key2.key);
+    printf("data: %s\n", node.info->info->data);
+}
+void print_node2(Node2 node) {
+    printf("key1: %d, key2: %d\n", node.info->key1.key, node.info->key2.key);
+    printf("data: %s\n", node.info->info->data);
+}
+
+void find_items_k1(Table table, KeyType1 key) {
+    KeySpace1 * ks = getKey1(table.ks1, key, table.msize1.index);
+    if (ks) {
+        Node1 * node = ks->node;
+        while (node) {
+            print_node1(*node);
+            node = node->next;
+        }
+        return;
+    }
+    printf("There is not items with such key.\n");
+}
+void find_items_k2(Table table, KeyType2 key) {
+    KeySpace2 * ks = getKey2(table.ks2, key, table.msize2.index);
+    if (ks) {
+        Node2 * node = ks->node;
+        while (node) {
+            print_node2(*node);
+            node = node->next;
+        }
+        return;
+    }
+    printf("There is not items with such key.\n");
+}
+
 void find_el_k1_k2_dialog(Table * table) {
-    printf("enter your keys:\n");
-    printf("key1:\n");
-    int k1 = get_int();
-    printf("key2:\n");
-    int k2 = get_int();
+    printf("What are you searching for?\n1) El with 2 keys\n2) Els with 1 key");
+    int x = -1;
+    while (x < 1 || x > 2) {
+        printf("\n");
+        x = get_int();
+    }
 
-    KeyType1 key1 = {1, k1};
-    KeyType2 key2 = {1, k2};
+    switch (x) {
+        case 1: {
+            printf("enter your keys:\n");
+            printf("key1:\n");
+            int k1 = get_int();
+            printf("key2:\n");
+            int k2 = get_int();
+            KeyType1 key1 = {1, k1};
+            KeyType2 key2 = {1, k2};
+            find_item(*table, key1, key2);
+            break;
+        }
+        case 2: {
+            printf("Which key do you have?\n1) key1\n2) key2\n");
+            x = 0;
+            while (x < 1 || x > 2) {
+                printf("\n");
+                x = get_int();
+            }
+            printf("enter your key:\n");
+            int k = get_int();
+            if (x == 1) {
+                KeyType1 key = {1, k};
+                find_items_k1(*table, key);
+            } else if (x == 2) {
+                KeyType2 key = {1, k};
+                find_items_k2(*table, key);
+            } else
+                return;
+            break;
+        }
+        default:
+            break;
+    }
 
-    find_item(*table, key1, key2);
 }
 
 /*
@@ -236,7 +302,6 @@ KeySpace1 * getKey1(KeySpace1 * KS, KeyType1 key, int size) {
     }
     return NULL;
 }
-
 KeySpace2 * getKey2(KeySpace2 * KS, KeyType2 key, int size) {
     for (int i = 0; i < size; ++i) {
         if (KS[i].key.busy) {
@@ -256,7 +321,6 @@ int number_of_nodes1(Node1 * node) {
     node->release.numberOfRelease = x;
     return x+1;
 }
-
 int number_of_nodes2(Node2 * node) {
     if (node == NULL) {
         return 0;
@@ -286,7 +350,6 @@ void delete_node1(KeySpace1 * ks1, KeyType1 key1, KeyType2 key2) {
 
     number_of_nodes1(ks1->node);
 }
-
 void delete_node2(KeySpace2 * ks2, KeyType1 key1, KeyType2 key2) {
     Node2 * node = ks2->node;
     Node2 * pr_node = ks2->node;

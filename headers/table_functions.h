@@ -11,4 +11,6 @@ void print_table(const Table table);
 void free_item(Item * item);
 void find_el_k1_k2_dialog(Table * table);
 void delete_el_k1_k2_dialog(Table * table);
+KeySpace1 * getKey1(KeySpace1 * KS, KeyType1 key, int size);
+KeySpace2 * getKey2(KeySpace2 * KS, KeyType2 key, int size);
 #endif //LAB3_TABLE_FUNCTIONS_H
